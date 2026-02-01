@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>QRIS Payment</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: #0a0a0a; /* Dark full */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.card {
+    width: 100%;
+    max-width: 420px;
+    padding: 22px;
+    border-radius: 18px;
+    background: rgba(20,20,20,0.85); /* Dark card */
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,.5);
+}
+
+/* VIDEO */
+.video-box {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.video-box video {
+    width: 100%;
+    display: block;
+}
+
+/* JAM & TANGGAL */
+.datetime {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0,0,0,.7);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    text-align: right;
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+.datetime span {
+    display: block;
+    font-weight: 400;
+    font-size: 11px;
+    opacity: .85;
+}
+
+/* CONTENT */
+h2 {
+    text-align: center;
+    margin: 10px 0 5px;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 14px;
+    opacity: .85;
+    margin-bottom: 20px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    margin-bottom: 15px;
+    background: #1a1a1a;
+    color: #fff;
+}
+
+input::placeholder {
+    color: #aaa;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pay {
+    background: #fff;
+    color: #000;
+}
+
+.pay:hover {
+    transform: translateY(-2px);
+}
+
+.status {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 13px;
+    opacity: .9;
+}
+
+.note {
+    text-align: center;
+    font-size: 12px;
+    margin-top: 8px;
+    opacity: .7;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+    <!-- BANNER VIDEO -->
+    <div class="video-box">
+        <video autoplay muted loop playsinline>
+            <source src="https://g.top4top.io/m_3672d3e6p5.mp4" type="video/mp4">
+        </video>
+
+        <!-- JAM & TANGGAL -->
+        <div class="datetime">
+            <div id="clock">00:00:00</div>
+            <span id="date">01 Januari 2026</span>
+        </div>
+    </div>
+
+    <h2>QRIS REYZ4YOU</h2>
+    <div class="subtitle">Pembayaran cepat & aman</div>
+
+    <input type="number" id="amount" placeholder="Masukkan nominal (Rp)">
+
+    <button class="pay" onclick="pay()">Bayar Sekarang</button>
+
+    <div class="status" id="status"></div>
+    <div class="note">Mendukung semua e-wallet & mobile banking</div>
+</div>
+
+<script>
+const SLUG = "reyz4youshop"; // ganti slug kamu
+
+/* JAM & TANGGAL REALTIME */
+function updateDateTime() {
+    const now = new Date();
+
+    const jam = now.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    });
+
+    const tanggal = now.toLocaleDateString("id-ID", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+    });
+
+    document.getElementById("clock").innerText = jam;
+    document.getElementById("date").innerText = tanggal;
+}
+
+setInterval(updateDateTime, 1000);
+updateDateTime();
+
+/* PAY */
+function pay() {
+    const amount = document.getElementById("amount").value;
+    const status = document.getElementById("status");
+
+    if (!amount || amount < 500) {
+        status.innerText = "❌ Minimal pembayaran Rp 500";
+        return;
+    }
+
+    const orderId = "INV" + Date.now();
+    const redirect = encodeURIComponent(
+        "https://reyzshop.xyzid.store/success"
+    );
+
+    const payUrl =
+        `https://app.pakasir.com/pay/${SLUG}/${amount}` +
+        `?order_id=${orderId}&qris_only=1&redirect=${redirect}`;
+
+    status.innerText = "⏳ Mengalihkan ke halaman pembayaran...";
+    setTimeout(() => {
+        window.location.href = payUrl;
+    }, 800);
+}
+</script>
+
+</body>
+</html>
